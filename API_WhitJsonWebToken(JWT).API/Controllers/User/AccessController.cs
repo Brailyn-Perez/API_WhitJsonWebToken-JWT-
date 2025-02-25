@@ -24,6 +24,7 @@ namespace API_WhitJsonWebToken_JWT_.API.Controllers.User
         [Route("Register")]
         public async Task<IActionResult> Register(CreateUserDTO createUser)
         {
+            
             var user = new Entities.User()
             {
                 Name = createUser.Name,
@@ -31,6 +32,10 @@ namespace API_WhitJsonWebToken_JWT_.API.Controllers.User
                 Password = _utilitys.encryptSHA256(createUser.Password)
             };
 
+            if (!ModelState.IsValid)
+            {
+                return StatusCode(StatusCodes.Status200OK, new { isSuccess = false });
+            }
             await _context.Users.AddAsync(user);
             await _context.SaveChangesAsync();
 
@@ -44,6 +49,10 @@ namespace API_WhitJsonWebToken_JWT_.API.Controllers.User
         [Route("Login")]
         public async Task<IActionResult> Login(LoginUsersDTO loginUsers)
         {
+            if (!ModelState.IsValid)
+            {
+                return StatusCode(StatusCodes.Status200OK, new { isSuccess = false});
+            }
             var findUser = await _context.Users
                 .Where(
                 x => x.EMail == loginUsers.EMail &&
