@@ -50,8 +50,6 @@ public partial class ApiJwtContext : DbContext
             entity.Property(e => e.Password)
                 .HasMaxLength(100)
                 .IsUnicode(false);
-            entity.Property(e => e.RefreshToken).HasMaxLength(100);
-            entity.Property(e => e.RefreshTokenExpiry);
         });
 
         OnModelCreatingPartial(modelBuilder);
