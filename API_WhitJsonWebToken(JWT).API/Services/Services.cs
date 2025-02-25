@@ -7,10 +7,10 @@ using System.Text;
 
 namespace API_WhitJsonWebToken_JWT_.API.Services
 {
-    public static class Services 
+    public static class Services
     {
 
-        public static IServiceCollection AddAplicationServices(this IServiceCollection services , IConfiguration configuration)
+        public static IServiceCollection AddAplicationServices(this IServiceCollection services, IConfiguration configuration)
         {
             #region "Context Config"
             services.AddDbContext<ApiJwtContext>(options =>

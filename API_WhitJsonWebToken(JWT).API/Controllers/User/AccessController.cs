@@ -4,6 +4,7 @@ using API_WhitJsonWebToken_JWT_.API.DTOS.Users;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
 
 namespace API_WhitJsonWebToken_JWT_.API.Controllers.User
 {
@@ -24,7 +25,7 @@ namespace API_WhitJsonWebToken_JWT_.API.Controllers.User
         [Route("Register")]
         public async Task<IActionResult> Register(CreateUserDTO createUser)
         {
-            
+
             var user = new Entities.User()
             {
                 Name = createUser.Name,
@@ -51,7 +52,7 @@ namespace API_WhitJsonWebToken_JWT_.API.Controllers.User
         {
             if (!ModelState.IsValid)
             {
-                return StatusCode(StatusCodes.Status200OK, new { isSuccess = false});
+                return StatusCode(StatusCodes.Status200OK, new { isSuccess = false });
             }
             var findUser = await _context.Users
                 .Where(
@@ -63,6 +64,32 @@ namespace API_WhitJsonWebToken_JWT_.API.Controllers.User
                 return StatusCode(StatusCodes.Status200OK, new { isSuccess = false, token = "" });
             else
                 return StatusCode(StatusCodes.Status200OK, new { isSuccess = true, token = _utilitys.generateJWT(findUser) });
+        }
+
+        [HttpPost("refresh")]
+        public IActionResult RefreshToken([FromBody] string token)
+        {
+            var principal = _utilitys.GetPrincipalFromExpiredToken(token);
+            if (principal == null)
+            {
+                return BadRequest("Invalid token");
+            }
+
+            var userId = principal.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+            if (userId == null)
+            {
+                return BadRequest("Invalid token");
+            }
+
+            var user = new Entities.User
+            {
+                Id = int.Parse(userId),
+                EMail = principal.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value
+            };
+
+            var newToken =_utilitys.generateJWT(user);
+            return Ok(new { token = newToken });
+
         }
     }
 }

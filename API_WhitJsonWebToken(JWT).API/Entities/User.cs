@@ -21,4 +21,7 @@ public partial class User
     [MaxLength(50)]
     [MinLength(10)]
     public string? Password { get; set; }
+
+    public string? RefreshToken { get; internal set; }
+    public DateTime? RefreshTokenExpiry { get; internal set; }
 }
